@@ -27,3 +27,16 @@ dat %>%
   ggplot(aes(x=Age, group=Gender, fill=Gender)) +
   geom_histogram(position="dodge") +
   theme_classic()
+
+dat %>%
+  select(Gender,
+         DOB,
+         `Cell Number`) %>%
+  filter(row_number() != 1) %>%
+  mutate(DOB_date = as.Date(DOB, "%d/%m/%Y"),
+         Gender = as.factor(Gender),
+         Age = as.numeric(difftime(as.Date("2019-11-29"), DOB_date)) / 365
+  ) %>%
+  group_by(`Cell Number`) %>%
+  summarise(n = n()) %>%
+  filter(n > 1)
