@@ -3,6 +3,7 @@ theme_set(theme_classic())
 
 library(brms)
 
+####### Prejudice overall
 brm.fit <- brm(
   prejudice ~ prejudice_lag + age + gender + q19_1 + movie * empathy + movie * vsas,
   family = gaussian(),
@@ -14,15 +15,14 @@ brm.fit <- brm(
   data = dat_clean
   )
 
-brm.fit <- brm(
-  mvbind(fearAvoid, malevolence, authority, unpredict) ~ fearAvoid + malevolence + authority + unpredict + age + gender + movie,
+####### Multivariate model of four prejudice factors
+brm.mv <- brm(
+  bf(fearAvoid ~ fearAvoid_lag + age + gender + q19_1 + movie * empathy + movie * vsas) +
+    bf(malevolence ~ malevolence_lag + age + gender + q19_1 + movie * empathy + movie * vsas) +
+    bf(authority ~ authority_lag + age + gender + q19_1 + movie * empathy + movie * vsas) +
+    bf(unpredict ~ unpredict_lag + age + gender + q19_1 + movie * empathy + movie * vsas),
   family = gaussian(),
   cores = 4,
   chains = 4,
-  data = testDat
+  data = dat_clean
 )
-
-dat %>%
-  filter(time < 3) %>%
-ggplot(aes(x=time, y=prejudice, group=number, color=movie)) +
-  geom_line()

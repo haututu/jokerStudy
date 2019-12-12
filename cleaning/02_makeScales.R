@@ -1,5 +1,7 @@
 source("cleaning/01_load.R")
 
+library(lavaan)
+
 ####### Recode questions
 
 recodeInt <- function(x, upper) {
@@ -80,7 +82,12 @@ dat_clean <- dat_prej %>%
   left_join(dat_emp, by=c("number", "time")) %>%
   left_join(dat_vsas, by=c("number", "time")) %>%
   group_by(number) %>%
-  mutate(prejudice_lag = lag(prejudice)) %>%
+  mutate(prejudice_lag = lag(prejudice),
+         fearAvoid_lag = lag(fearAvoid),
+         malevolence_lag = lag(malevolence),
+         authority_lag = lag(authority),
+         unpredict_lag = lag(unpredict)
+         ) %>%
   ungroup() %>%
   filter(time == 2)
   
