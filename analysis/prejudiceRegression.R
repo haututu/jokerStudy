@@ -26,3 +26,4 @@ dat %>%
   filter(time < 3) %>%
 ggplot(aes(x=time, y=prejudice, group=number, color=movie)) +
   geom_line()
+

@@ -1,5 +1,7 @@
 source("cleaning/01_load.R")
 
+library(lavaan)
+
 ####### Recode questions
 
 recodeInt <- function(x, upper) {
