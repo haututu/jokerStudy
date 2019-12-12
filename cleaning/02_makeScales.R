@@ -7,9 +7,9 @@ recodeInt <- function(x, upper) {
 }
 
 dat <- dat %>%
-  mutate(prejudice_na = rowSums(select(., contains("prejudice_"))),
-         empathy_na = rowSums(select(., contains("empathy_"))),
-         vsas_na = rowSums(select(., contains("vsas_")))
+  mutate(prejudice_na = rowSums(select(., contains("prejudice_")), na.rm=TRUE),
+         empathy_na = rowSums(select(., contains("empathy_")), na.rm=TRUE),
+         vsas_na = rowSums(select(., contains("vsas_")), na.rm=TRUE)
   ) %>%
   mutate_at(vars(num_range("prejudice_", c(1:4, 9:12, 17:19, 23:25))), funs(recodeInt(., 7))) %>%
   mutate_at(vars(num_range("empathy_", c(2, 4, 5))), funs(recodeInt(., 4))) %>%
@@ -25,7 +25,8 @@ dat_clean <- dat %>%
          movie,
          prejudice_na,
          empathy_na,
-         vsas_na)
+         vsas_na,
+         q19_1)
 
 ####### Prejudice
 
@@ -43,22 +44,43 @@ cfa.prejudice <- cfa(
         sep=" \n "
   ), 
   cluster="number",
+  missing = "ML",
   data=dat)
+
+dat_prej <- dat_clean %>%
+  cbind(predict(cfa.prejudice))
 
 ####### Empathy
 
 cfa.empathy <- cfa(
-  paste("empathy =~", paste0("prejudice_", 1:7, collapse=" + ")), 
+  paste("empathy =~", paste0("empathy_", 1:7, collapse=" + ")), 
   cluster="number",
+  missing = "ML",
   data=dat)
+
+dat_emp <- dat_clean %>%
+  select(number, time) %>%
+  cbind(predict(cfa.empathy))
 
 ####### Authoritarianism
 
 cfa.vsas <- cfa(
   paste("vsas =~", paste0("vsas_", 1:6, collapse=" + ")), 
   cluster="number",
+  missing = "ML",
   data=dat)
+
+dat_vsas <- dat_clean %>%
+  select(number, time) %>%
+  cbind(predict(cfa.vsas))
 
 ####### Add latent measures to clean data
 
-dat_clean
+dat_clean <- dat_prej %>%
+  left_join(dat_emp, by=c("number", "time")) %>%
+  left_join(dat_vsas, by=c("number", "time")) %>%
+  group_by(number) %>%
+  mutate(prejudice_lag = lag(prejudice)) %>%
+  ungroup() %>%
+  filter(time == 2)
+  
