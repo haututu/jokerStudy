@@ -24,5 +24,16 @@ brm.mv <- brm(
   family = gaussian(),
   cores = 4,
   chains = 4,
+<<<<<<< HEAD
   data = dat_clean
 )
+=======
+  data = testDat
+)
+
+dat %>%
+  filter(time < 3) %>%
+ggplot(aes(x=time, y=prejudice, group=number, color=movie)) +
+  geom_line()
+
+>>>>>>> 36b7e258dde76ca7e6f20327a03da4fef0e0bc78
