@@ -2,9 +2,14 @@ source("cleaning/01_load.R")
 
 ####### Recode questions
 
+recodeInt <- function(x, upper) {
+  upper - x
+}
+
 dat <- dat %>%
   mutate(prejudice_na = rowSums(select(., contains("prejudice_")))
-  )
+  ) %>%
+  mutate_at(vars(num_range("prejudice_", c(1:4, 9:12, 17:19, 23:25))), funs(recodeInt(., 7)))
 
 ####### Prejudice
 
