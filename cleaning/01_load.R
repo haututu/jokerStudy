@@ -12,6 +12,7 @@ dat <- readxl::read_excel("data/Taylor-Joker-Study-T123-ds2-cleaned.xlsx") %>%
          time = ifelse(time == 3, time + day - 1, time) # Correct T3 variable if they responded a day late or more
          ) %>%
   ungroup() %>% 
+  filter(gender != 3) %>%
   mutate(movie = as.factor(movie),
          gender = as.factor(gender),
          number = as.factor(number),

@@ -13,7 +13,7 @@ dat <- dat %>%
   ) %>%
   mutate_at(vars(num_range("prejudice_", c(1:4, 9:12, 17:19, 23:25))), funs(recodeInt(., 7))) %>%
   mutate_at(vars(num_range("empathy_", c(2, 4, 5))), funs(recodeInt(., 4))) %>%
-  mutate_at(vars(num_range("vsas_", c(1, 4, 5))), funs(recodeInt(., 7)))
+  mutate_at(vars(num_range("vsas_", c(2, 3, 6))), funs(recodeInt(., 7)))
 
 ####### Establish base dataset then add latent vars
 
