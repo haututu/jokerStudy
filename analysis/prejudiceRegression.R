@@ -4,11 +4,14 @@ theme_set(theme_classic())
 library(brms)
 
 brm.fit <- brm(
-  prejudice ~ prejudiceLag + age + gender + movie,
+  prejudice ~ prejudice_lag + age + gender + q19_1 + movie * empathy + movie * vsas,
   family = gaussian(),
+  prior = c(
+    set_prior("normal(0, 2)", class="b")
+    ),
   cores = 4,
   chains = 4,
-  data = testDat
+  data = dat_clean
   )
 
 brm.fit <- brm(

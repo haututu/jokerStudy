@@ -4,13 +4,17 @@ dat <- readxl::read_excel("data/Taylor-Joker-Study-T123-ds2-cleaned.xlsx") %>%
   rename_all(tolower) %>% # Make lower case
   filter(!(is.na(number))) %>% # Remove NA cellnumbers
   group_by(number) %>%
+  filter(n() > 1) %>%
   mutate(movie = max(movie, na.rm=TRUE),
          age = max(age, na.rm=TRUE),
          gender = max(gender, na.rm=TRUE), # Add movie condition to T1
+         q19_1 = max(q19_1, na.rm=TRUE),
          time = ifelse(time == 3, time + day - 1, time) # Correct T3 variable if they responded a day late or more
          ) %>%
   ungroup() %>% 
   mutate(movie = as.factor(movie),
          gender = as.factor(gender),
-         number = as.factor(number)
+         number = as.factor(number),
+         q19_1 = ifelse(q19_1 == 1, 1, 0),
+         q19_1 = as.factor(q19_1)
          )
