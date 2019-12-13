@@ -15,8 +15,8 @@ dat <- readxl::read_excel("data/Taylor-Joker-Study-T123-ds2-cleaned.xlsx") %>%
            TRUE ~ time) # Correct T3 variable if they responded a day late or more
          ) %>%
   ungroup() %>% 
-  filter(gender != 3) %>%
-  mutate(movie = ifelse(movie == 1, 2, 1), # Flipping the movie coding so Terminator is the baseline/reference in regression.
+  filter(gender %in% c(1, 2)) %>%
+  mutate(movie = ifelse(movie == 1, 2, ifelse(movie == 2, 1, NA)), # Flipping the movie coding so Terminator is the baseline/reference in regression.
     movie = as.factor(movie),
          gender = as.factor(gender),
          number = as.factor(number),

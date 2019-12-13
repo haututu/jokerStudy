@@ -9,7 +9,7 @@ brm.fit <- brm(
   family = gaussian(),
   prior = c(
     set_prior("normal(0, 1)", class="b"),
-    set_prior("normal(-0.15, 0.2)", coef="movie2")
+    set_prior("normal(0.15, 0.2)", coef="movie2")
   ),
   cores = 4,
   chains = 4,

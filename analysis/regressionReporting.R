@@ -19,7 +19,7 @@ dat_prej %>%
 
 # Figure 1
 marginal_effects(brm.fit, "vsas:movie")$`vsas:movie` %>%
-  mutate(effect2__ = ifelse(effect2__ == 1, "Joker", "Terminator: Dark Fate")) %>%
+  mutate(effect2__ = ifelse(effect2__ == 2, "Joker", "Terminator: Dark Fate")) %>%
   ggplot(aes(x=effect1__, y=estimate__, ymax=upper__, ymin=lower__, group=effect2__, color=effect2__, linetype=effect2__)) +
   geom_line(size = 1) +
   geom_ribbon(aes(fill=effect2__, color=NULL), alpha=0.4) +
@@ -33,7 +33,7 @@ marginal_effects(brm.fit, "vsas:movie")$`vsas:movie` %>%
   theme(text = element_text(size=11))
 
 # Table 1
-test <- summary(brm.fit)$fixed %>%
+summary(brm.fit)$fixed %>%
   data.frame() %>%
   mutate(Effect = rownames(.)) %>%
   select(Effect, everything(), -Eff.Sample, -Rhat) %>%
