@@ -1,6 +1,42 @@
 library(knitr)
 library(kableExtra)
 
+####### Descriptives
+dat %>%
+  filter(time == 2)
+
+dat_prej %>%
+  left_join(dat_emp, by=c("number", "time")) %>%
+  left_join(dat_vsas, by=c("number", "time")) %>%
+  filter(time == 2) %>%
+  group_by(movie) %>%
+  summarise(n = n(),
+            females = sum(gender==2),
+            age = mean(age)
+            )
+
+####### Basic analysis
+marginal_effects(brm.fit)
+
+sjstats::rope(brm.fit, c(-1000, 0))
+
+marginal_effects(brm.fit, "vsas:movie")$`vsas:movie` %>%
+  mutate(effect2__ = ifelse(effect2__ == 1, "Joker", "Terminator: Dark Fate")) %>%
+  ggplot(aes(x=effect1__, y=estimate__, ymax=upper__, ymin=lower__, group=effect2__, color=effect2__, linetype=effect2__)) +
+  geom_line(size = 1) +
+  geom_ribbon(aes(fill=effect2__, color=NULL), alpha=0.4) +
+  labs(
+    y = "Prejudice",
+    x = "Authoritarianism",
+    fill = "Movie",
+    color = "Movie",
+    linetype= "Movie"
+  ) +
+  theme(text = element_text(size=11))
+
+####### Multivariate analysis
+
+# Multivariate pps'
 posterior_samples(brm.mv) %>% 
   gather(parameter, sample) %>% 
   group_by(parameter) %>% 

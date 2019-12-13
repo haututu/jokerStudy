@@ -9,7 +9,10 @@ dat <- readxl::read_excel("data/Taylor-Joker-Study-T123-ds2-cleaned.xlsx") %>%
          age = max(age, na.rm=TRUE),
          gender = max(gender, na.rm=TRUE), # Add movie condition to T1
          q19_1 = max(q19_1, na.rm=TRUE),
-         time = ifelse(time == 3, time + day - 1, time) # Correct T3 variable if they responded a day late or more
+         time = case_when(
+           (time == 3 & day == 1) ~ 3,
+           (time == 3 & day != 1) ~ 4,
+           TRUE ~ time) # Correct T3 variable if they responded a day late or more
          ) %>%
   ungroup() %>% 
   filter(gender != 3) %>%

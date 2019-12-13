@@ -78,16 +78,56 @@ dat_vsas <- dat_clean %>%
 
 ####### Add latent measures to clean data
 
+# Data for single timepoint analysis
 dat_clean <- dat_prej %>%
   left_join(dat_emp, by=c("number", "time")) %>%
   left_join(dat_vsas, by=c("number", "time")) %>%
+  mutate(
+    prejudice = as.vector(scale(prejudice)),
+    fearAvoid = as.vector(scale(fearAvoid)),
+    malevolence = as.vector(scale(malevolence)),
+    authority = as.vector(scale(authority)),
+    unpredict = as.vector(scale(unpredict)),
+    empathy = as.vector(scale(empathy)),
+    vsas = as.vector(scale(vsas)),
+    age = as.vector(scale(age))
+  ) %>%
+  group_by(number) %>%
+  mutate(prejudice_lag = lag(prejudice),
+         fearAvoid_lag = lag(fearAvoid),
+         malevolence_lag = lag(malevolence),
+         authority_lag = lag(authority),
+         unpredict_lag = lag(unpredict),
+         ) %>%
+  ungroup() %>%
+  filter(time == 2)
+
+# Data for multi-timepoint analysis
+dat_clean_multipoint <- dat_prej %>%
+  left_join(dat_emp, by=c("number", "time")) %>%
+  left_join(dat_vsas, by=c("number", "time")) %>%
+  mutate(
+    prejudice = as.vector(scale(prejudice)),
+    fearAvoid = as.vector(scale(fearAvoid)),
+    malevolence = as.vector(scale(malevolence)),
+    authority = as.vector(scale(authority)),
+    unpredict = as.vector(scale(unpredict)),
+    empathy = as.vector(scale(empathy)),
+    vsas = as.vector(scale(vsas)),
+    age = as.vector(scale(age))
+  ) %>%
   group_by(number) %>%
   mutate(prejudice_lag = lag(prejudice),
          fearAvoid_lag = lag(fearAvoid),
          malevolence_lag = lag(malevolence),
          authority_lag = lag(authority),
          unpredict_lag = lag(unpredict)
+  ) %>%
+  ungroup() %>%
+  filter(time > 1) %>%
+  group_by(number) %>%
+  mutate(empathy = max(empathy, na.rm=TRUE),
+         vsas = max(vsas, na.rm=TRUE)
          ) %>%
   ungroup() %>%
-  filter(time == 2)
-  
+  mutate(time = as.ordered(time))
