@@ -8,12 +8,13 @@ brm.fit <- brm(
   prejudice ~ prejudice_lag + age + gender + q19_1 + movie * empathy + movie * vsas,
   family = gaussian(),
   prior = c(
-    set_prior("normal(0, 2)", class="b")
-    ),
+    set_prior("normal(0, 1)", class="b"),
+    set_prior("normal(-0.15, 0.2)", coef="movie2")
+  ),
   cores = 4,
   chains = 4,
   data = dat_clean
-  )
+)
 
 ####### Multivariate model of four prejudice factors
 brm.mv <- brm(
@@ -24,16 +25,17 @@ brm.mv <- brm(
   family = gaussian(),
   cores = 4,
   chains = 4,
-<<<<<<< HEAD
   data = dat_clean
 )
-=======
-  data = testDat
+
+####### Prejudice overall with 48hr followup
+brm.multipoint <- brm(
+  prejudice ~ prejudice_lag + age + gender + q19_1 + movie * time + movie * empathy + movie * vsas + (1|number),
+  family = gaussian(),
+  prior = c(
+    set_prior("normal(0, 2)", class="b")
+  ),
+  cores = 4,
+  chains = 4,
+  data = dat_clean_multipoint
 )
-
-dat %>%
-  filter(time < 3) %>%
-ggplot(aes(x=time, y=prejudice, group=number, color=movie)) +
-  geom_line()
-
->>>>>>> 36b7e258dde76ca7e6f20327a03da4fef0e0bc78

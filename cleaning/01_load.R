@@ -16,7 +16,8 @@ dat <- readxl::read_excel("data/Taylor-Joker-Study-T123-ds2-cleaned.xlsx") %>%
          ) %>%
   ungroup() %>% 
   filter(gender != 3) %>%
-  mutate(movie = as.factor(movie),
+  mutate(movie = ifelse(movie == 1, 2, 1), # Flipping the movie coding so Terminator is the baseline/reference in regression.
+    movie = as.factor(movie),
          gender = as.factor(gender),
          number = as.factor(number),
          q19_1 = ifelse(q19_1 == 1, 1, 0),
