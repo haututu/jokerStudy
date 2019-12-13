@@ -38,8 +38,10 @@ test <- summary(brm.fit)$fixed %>%
   mutate(Effect = rownames(.)) %>%
   select(Effect, everything(), -Eff.Sample, -Rhat) %>%
   cbind(
-    sjstats::rope(brm.fit)
-  )
+    pp = sjstats::rope(brm.fit, c(-1000, 0))[,5]
+  ) %>%
+  mutate(pp = ifelse(pp < 0.5, 1-pp, pp)
+         )
 
 ####### Multivariate analysis
 
