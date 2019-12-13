@@ -16,10 +16,8 @@ dat_prej %>%
             )
 
 ####### Basic analysis
-marginal_effects(brm.fit)
 
-sjstats::rope(brm.fit, c(-1000, 0))
-
+# Figure 1
 marginal_effects(brm.fit, "vsas:movie")$`vsas:movie` %>%
   mutate(effect2__ = ifelse(effect2__ == 1, "Joker", "Terminator: Dark Fate")) %>%
   ggplot(aes(x=effect1__, y=estimate__, ymax=upper__, ymin=lower__, group=effect2__, color=effect2__, linetype=effect2__)) +
@@ -33,6 +31,15 @@ marginal_effects(brm.fit, "vsas:movie")$`vsas:movie` %>%
     linetype= "Movie"
   ) +
   theme(text = element_text(size=11))
+
+# Table 1
+test <- summary(brm.fit)$fixed %>%
+  data.frame() %>%
+  mutate(Effect = rownames(.)) %>%
+  select(Effect, everything(), -Eff.Sample, -Rhat) %>%
+  cbind(
+    sjstats::rope(brm.fit)
+  )
 
 ####### Multivariate analysis
 
