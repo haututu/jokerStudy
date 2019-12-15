@@ -28,7 +28,10 @@ dat_clean <- dat %>%
          prejudice_na,
          empathy_na,
          vsas_na,
-         q19_1)
+         q19_1,
+         ethnicity1,
+         ethnicity2,
+         ethnicity3)
 
 ####### Prejudice
 

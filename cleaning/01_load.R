@@ -12,7 +12,10 @@ dat <- readxl::read_excel("data/Taylor-Joker-Study-T123-ds2-cleaned.xlsx") %>%
          time = case_when(
            (time == 3 & day == 1) ~ 3,
            (time == 3 & day != 1) ~ 4,
-           TRUE ~ time) # Correct T3 variable if they responded a day late or more
+           TRUE ~ time), # Correct T3 variable if they responded a day late or more
+         ethnicity1 = max(ethnicity1, na.rm=TRUE),
+         ethnicity2 = max(ethnicity2, na.rm=TRUE),
+         ethnicity3 = max(ethnicity3, na.rm=TRUE)
          ) %>%
   ungroup() %>% 
   filter(gender %in% c(1, 2)) %>%

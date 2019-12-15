@@ -9,10 +9,16 @@ dat_prej %>%
   left_join(dat_emp, by=c("number", "time")) %>%
   left_join(dat_vsas, by=c("number", "time")) %>%
   filter(time == 2) %>%
+  mutate(ethnicity = paste(ethnicity1, ethnicity2, ethnicity3, sep=",")) %>%
   group_by(movie) %>%
   summarise(n = n(),
             females = sum(gender==2),
-            age = mean(age)
+            age_mean = mean(age),
+            age_std = sd(age),
+            eth_euro = mean(grepl("1", ethnicity)),
+            eth_asian = mean(grepl("5", ethnicity)),
+            eth_maoriPacific = mean(grepl("2|3", ethnicity)),
+            eth_other = mean(!(grepl("1|2|3|5", ethnicity)))
             )
 
 ####### Basic analysis
@@ -31,6 +37,23 @@ marginal_effects(brm.fit, "vsas:movie")$`vsas:movie` %>%
     linetype= "Movie"
   ) +
   theme(text = element_text(size=11))
+
+marginal_effects(brm.fit, "movie:vsas")$`movie:vsas` %>%
+  mutate(effect1__ = ifelse(effect1__ == 2, "Joker", "Terminator: Dark Fate")) %>%
+  filter(vsas != -0.03) %>%
+  mutate(effect2__ = ifelse(effect2__ == -1.03, "Low (-1SD)", "High (+1SD")) %>%
+  ggplot(aes(x=effect1__, y=estimate__, ymax=upper__, ymin=lower__, group=effect2__, color=effect2__)) +
+  geom_point(size = 2, position = position_dodge(width=0.1)) +
+  geom_line(size = 1, position = position_dodge(width=0.1), aes(linetype=effect2__)) +
+  geom_errorbar(size = 1, width = 0.1, position=position_dodge(width=0.1)) +
+  scale_x_discrete(limits=c("Terminator: Dark Fate", "Joker")) +
+  labs(x="Movie",
+       y="Prejudice",
+       color="Authoritarianism",
+       linetype="Authoritarianism")
+  
+
+marginal_effects(brm.fit, "movie", conditions = data.frame(vsas = c(-1, 1)))
 
 # Table 1
 summary(brm.fit)$fixed %>%
