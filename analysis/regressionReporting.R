@@ -24,36 +24,20 @@ dat_prej %>%
 ####### Basic analysis
 
 # Figure 1
-marginal_effects(brm.fit, "vsas:movie")$`vsas:movie` %>%
+marginal_effects(brm.multipoint, effects = "time:movie")$`time:movie` %>%
   mutate(effect2__ = ifelse(effect2__ == 2, "Joker", "Terminator: Dark Fate")) %>%
   ggplot(aes(x=effect1__, y=estimate__, ymax=upper__, ymin=lower__, group=effect2__, color=effect2__, linetype=effect2__)) +
-  geom_line(size = 1) +
-  geom_ribbon(aes(fill=effect2__, color=NULL), alpha=0.4) +
+  geom_point(size = 1, position = position_dodge(width=0.2)) +
+  geom_line(size = 1, position = position_dodge(width=0.2)) +
+  geom_errorbar(width = 0.2, position = position_dodge(width=0.2)) +
   labs(
     y = "Prejudice",
-    x = "Authoritarianism",
+    x = "Time",
     fill = "Movie",
     color = "Movie",
     linetype= "Movie"
   ) +
   theme(text = element_text(size=11))
-
-marginal_effects(brm.fit, "movie:vsas")$`movie:vsas` %>%
-  mutate(effect1__ = ifelse(effect1__ == 2, "Joker", "Terminator: Dark Fate")) %>%
-  filter(vsas != -0.03) %>%
-  mutate(effect2__ = ifelse(effect2__ == -1.03, "Low (-1SD)", "High (+1SD")) %>%
-  ggplot(aes(x=effect1__, y=estimate__, ymax=upper__, ymin=lower__, group=effect2__, color=effect2__)) +
-  geom_point(size = 2, position = position_dodge(width=0.1)) +
-  geom_line(size = 1, position = position_dodge(width=0.1), aes(linetype=effect2__)) +
-  geom_errorbar(size = 1, width = 0.1, position=position_dodge(width=0.1)) +
-  scale_x_discrete(limits=c("Terminator: Dark Fate", "Joker")) +
-  labs(x="Movie",
-       y="Prejudice",
-       color="Authoritarianism",
-       linetype="Authoritarianism")
-  
-
-marginal_effects(brm.fit, "movie", conditions = data.frame(vsas = c(-1, 1)))
 
 # Table 1
 summary(brm.fit)$fixed %>%
@@ -86,3 +70,26 @@ posterior_samples(brm.mv) %>%
   kable(align = "c", escape=F) %>%
   kable_styling(full_width = FALSE, bootstrap_options = "condensed") %>%
   collapse_rows(columns = 1, valign = "top")
+
+# Figure 1
+marginal_effects(brm.mv, effects = "movie")$`movie`
+
+test <- marginal_effects(brm.mv)
+
+bind_rows(test$fearAvoid.fearAvoid_movie %>% mutate(resp = "Fear Avoidance"),
+          test$malevolence.malevolence_movie %>% mutate(resp = "Malevolence"),
+          test$authority.authority_movie %>% mutate(resp = "Authoritarianism"),
+          test$unpredict.unpredict_movie %>% mutate(resp = "Unpredictability")
+          ) %>%
+  mutate(effect1__ = ifelse(effect1__ == 2, "Joker", "Terminator: Dark Fate")) %>%
+  ggplot(aes(x=resp, y=estimate__, ymin=lower__, ymax=upper__, group=effect1__, color=effect1__, shape=effect1__)) +
+  geom_point(position = position_dodge(width=0.2), size=3) +
+  geom_errorbar(position = position_dodge(width=0.2), width=0.5) +
+  labs(
+    y = "Prejudice",
+    x = "Time",
+    shape = "Movie",
+    color = "Movie"
+  ) +
+  theme(text = element_text(size=11))
+  

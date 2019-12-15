@@ -55,44 +55,16 @@ cfa.prejudice <- cfa(
 dat_prej <- dat_clean %>%
   cbind(predict(cfa.prejudice))
 
-####### Empathy
-
-cfa.empathy <- cfa(
-  paste("empathy =~", paste0("empathy_", 1:7, collapse=" + ")), 
-  cluster="number",
-  missing = "ML",
-  data=dat)
-
-dat_emp <- dat_clean %>%
-  select(number, time) %>%
-  cbind(predict(cfa.empathy))
-
-####### Authoritarianism
-
-cfa.vsas <- cfa(
-  paste("vsas =~", paste0("vsas_", 1:6, collapse=" + ")), 
-  cluster="number",
-  missing = "ML",
-  data=dat)
-
-dat_vsas <- dat_clean %>%
-  select(number, time) %>%
-  cbind(predict(cfa.vsas))
-
 ####### Add latent measures to clean data
 
 # Data for single timepoint analysis
 dat_clean <- dat_prej %>%
-  left_join(dat_emp, by=c("number", "time")) %>%
-  left_join(dat_vsas, by=c("number", "time")) %>%
   mutate(
     prejudice = as.vector(scale(prejudice)),
     fearAvoid = as.vector(scale(fearAvoid)),
     malevolence = as.vector(scale(malevolence)),
     authority = as.vector(scale(authority)),
     unpredict = as.vector(scale(unpredict)),
-    empathy = as.vector(scale(empathy)),
-    vsas = as.vector(scale(vsas)),
     age = as.vector(scale(age))
   ) %>%
   group_by(number) %>%
@@ -107,30 +79,18 @@ dat_clean <- dat_prej %>%
 
 # Data for multi-timepoint analysis
 dat_clean_multipoint <- dat_prej %>%
-  left_join(dat_emp, by=c("number", "time")) %>%
-  left_join(dat_vsas, by=c("number", "time")) %>%
   mutate(
     prejudice = as.vector(scale(prejudice)),
     fearAvoid = as.vector(scale(fearAvoid)),
     malevolence = as.vector(scale(malevolence)),
     authority = as.vector(scale(authority)),
     unpredict = as.vector(scale(unpredict)),
-    empathy = as.vector(scale(empathy)),
-    vsas = as.vector(scale(vsas)),
     age = as.vector(scale(age))
   ) %>%
   group_by(number) %>%
-  mutate(prejudice_lag = lag(prejudice),
-         fearAvoid_lag = lag(fearAvoid),
-         malevolence_lag = lag(malevolence),
-         authority_lag = lag(authority),
-         unpredict_lag = lag(unpredict)
-  ) %>%
+  mutate(prejudiceLag = lag(prejudice)) %>%
   ungroup() %>%
   filter(time > 1) %>%
   group_by(number) %>%
-  mutate(empathy = max(empathy, na.rm=TRUE),
-         vsas = max(vsas, na.rm=TRUE)
-         ) %>%
   ungroup() %>%
   mutate(time = as.ordered(time))
