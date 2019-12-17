@@ -19,23 +19,23 @@ dat_prej %>%
             eth_asian = mean(grepl("5", ethnicity)),
             eth_maoriPacific = mean(grepl("2|3", ethnicity)),
             eth_other = mean(!(grepl("1|2|3|5", ethnicity)))
-            )
+            ) %>%
+  t() %>%
+  kable() %>%
+  kable_styling()
 
 ####### Basic analysis
 
 # Figure 1
-marginal_effects(brm.multipoint, effects = "time:movie")$`time:movie` %>%
-  mutate(effect2__ = ifelse(effect2__ == 2, "Joker", "Terminator: Dark Fate")) %>%
-  ggplot(aes(x=effect1__, y=estimate__, ymax=upper__, ymin=lower__, group=effect2__, color=effect2__, linetype=effect2__)) +
+marginal_effects(brm.fit, effects = "movie")$`movie` %>%
+  mutate(effect1__ = ifelse(effect1__ == 2, "Joker", "Terminator: Dark Fate")) %>%
+  ggplot(aes(x=effect1__, y=estimate__, ymax=upper__, ymin=lower__, group=1)) +
   geom_point(size = 1, position = position_dodge(width=0.2)) +
   geom_line(size = 1, position = position_dodge(width=0.2)) +
   geom_errorbar(width = 0.2, position = position_dodge(width=0.2)) +
   labs(
     y = "Prejudice",
-    x = "Time",
-    fill = "Movie",
-    color = "Movie",
-    linetype= "Movie"
+    x = "Time"
   ) +
   theme(text = element_text(size=11))
 
