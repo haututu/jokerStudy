@@ -14,7 +14,6 @@ cfa.prejudice <- cfa(
         malevolence,
         authority,
         unpredict,
-        "prejudice =~ fearAvoid + malevolence + authority + unpredict",
         sep=" \n "
         ), 
   data=dat)
