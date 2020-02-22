@@ -24,6 +24,66 @@ dat_prej %>%
   kable() %>%
   kable_styling()
 
+bind_rows(
+  dat_prej %>%
+    left_join(dat_emp, by=c("number", "time")) %>%
+    left_join(dat_vsas, by=c("number", "time")) %>%
+    filter(time == 2) %>%
+    mutate(ethnicity = paste(ethnicity1, ethnicity2, ethnicity3, sep=",")) %>%
+    group_by(movie) %>%
+    summarise(n = n(),
+              females = sum(gender==2),
+              age_mean = mean(age),
+              age_std = sd(age),
+              eth_euro_n = sum(grepl("1", ethnicity)),
+              eth_euro_p = mean(grepl("1", ethnicity)),
+              eth_asian_n = sum(grepl("5", ethnicity)),
+              eth_asian_p = mean(grepl("5", ethnicity)),
+              eth_maoriPacific_n = sum(grepl("2|3", ethnicity)),
+              eth_maoriPacific_p = mean(grepl("2|3", ethnicity)),
+              eth_other_n = sum(!(grepl("1|2|3|5", ethnicity))),
+              eth_other_p = mean(!(grepl("1|2|3|5", ethnicity)))
+    ),
+  dat_prej %>%
+    left_join(dat_emp, by=c("number", "time")) %>%
+    left_join(dat_vsas, by=c("number", "time")) %>%
+    filter(time == 2) %>%
+    mutate(ethnicity = paste(ethnicity1, ethnicity2, ethnicity3, sep=","),
+           movie = "total") %>%
+    group_by(movie) %>%
+    summarise(n = n(),
+              females = sum(gender==2),
+              age_mean = mean(age),
+              age_std = sd(age),
+              eth_euro_n = sum(grepl("1", ethnicity)),
+              eth_euro_p = mean(grepl("1", ethnicity)),
+              eth_asian_n = sum(grepl("5", ethnicity)),
+              eth_asian_p = mean(grepl("5", ethnicity)),
+              eth_maoriPacific_n = sum(grepl("2|3", ethnicity)),
+              eth_maoriPacific_p = mean(grepl("2|3", ethnicity)),
+              eth_other_n = sum(!(grepl("1|2|3|5", ethnicity))),
+              eth_other_p = mean(!(grepl("1|2|3|5", ethnicity)))
+              )
+  ) %>%
+  t() %>%
+  kable() %>%
+  kable_styling()
+
+dat_clean %>%
+  #group_by(movie) %>%
+  summarise(
+    prejudice_t0 = mean(prejudice_lag, na.rm=TRUE),
+    prejudice_t1 = mean(prejudice)
+    )
+            
+
+ggplot(dat_prej %>%
+         filter(time <= 2) %>%
+         group_by(number) %>%
+         mutate(cnt = n()) %>%
+         filter(cnt > 1) %>% 
+         mutate(time = as.factor(time)), aes(x=prejudice, group=time, color=time)) + geom_density() + facet_wrap(~movie)
+
 ####### Basic analysis
 
 # Figure 1
