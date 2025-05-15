@@ -1,10 +1,8 @@
 source("cleaning/01_load.R")
 
-<<<<<<< HEAD
-=======
+
 library(lavaan)
 
->>>>>>> c7429b1fb3c34eefe132787f1a5b6b7366d32527
 ####### Recode questions
 
 recodeInt <- function(x, upper) {
@@ -12,7 +10,6 @@ recodeInt <- function(x, upper) {
 }
 
 dat <- dat %>%
-<<<<<<< HEAD
   mutate_at(vars(num_range("prejudice_", c(5:8, 13:16, 20:22, 26:28))), funs(recodeInt(., 7)))
 
 ####### Prejudice
@@ -22,10 +19,9 @@ dat <- dat %>%
          ) %>%
   group_by(number) %>%
   mutate(prejudiceLag = lag(prejudice)) %>%
-  ungroup()
+  ungroup() %>%
 
 # Reverse coding
-=======
   mutate(prejudice_na = rowSums(select(., contains("prejudice_")), na.rm=TRUE),
          empathy_na = rowSums(select(., contains("empathy_")), na.rm=TRUE),
          vsas_na = rowSums(select(., contains("vsas_")), na.rm=TRUE)
@@ -64,7 +60,7 @@ cfa.prejudice <- cfa(
   ), 
   cluster="number",
   missing = "ML",
-  data=dat)
+  data=dat %>% select(-prejudice))
 
 dat_prej <- dat_clean %>%
   cbind(predict(cfa.prejudice))
@@ -148,4 +144,15 @@ dat_clean_multipoint <- dat_prej %>%
          ) %>%
   ungroup() %>%
   mutate(time = as.ordered(time))
->>>>>>> c7429b1fb3c34eefe132787f1a5b6b7366d32527
+
+
+dat_stat <- dat_prej %>%
+  select(number, time, gender, age, movie, prejudice) %>%
+  filter(time <= 2) %>%
+  mutate(age = plyr::round_any(age, 5, ceiling))
+
+dat_stat %>%
+  ggplot(aes(x=time, y=prejudice, color=movie)) +
+  geom_smooth()
+
+write_csv(dat_stat, "data/joker_data.csv")
